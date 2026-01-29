@@ -19,18 +19,25 @@ def create_movie_session(
 
 
 def get_movies_sessions(date: Optional[str] = None) -> QuerySet[MovieSession]:
-    qs = MovieSession.objects.select_related("movie", "cinema_hall").all()
+    queryset = MovieSession.objects.select_related(
+        "movie",
+        "cinema_hall",
+    ).all()
 
     if date:
-        # tests pass strings like "2019-8-19" or "2021-4-3"
-        y, m, d = (int(x) for x in date.split("-"))
-        qs = qs.filter(show_time__date=datetime.date(y, m, d))
+        year, month, day = (int(value) for value in date.split("-"))
+        queryset = queryset.filter(
+            show_time__date=datetime.date(year, month, day)
+        )
 
-    return qs
+    return queryset
 
 
 def get_movie_session_by_id(movie_session_id: int) -> MovieSession:
-    return MovieSession.objects.select_related("movie", "cinema_hall").get(id=movie_session_id)
+    return MovieSession.objects.select_related(
+        "movie",
+        "cinema_hall",
+    ).get(id=movie_session_id)
 
 
 def update_movie_session(
@@ -43,8 +50,10 @@ def update_movie_session(
 
     if show_time is not None:
         session.show_time = show_time
+
     if movie_id is not None:
         session.movie_id = movie_id
+
     if cinema_hall_id is not None:
         session.cinema_hall_id = cinema_hall_id
 
