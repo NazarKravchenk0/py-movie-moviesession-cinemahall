@@ -1,15 +1,16 @@
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("db", "0001_initial"),
-    ]
+    initial = True
+
+    # Initial migration must not depend on itself.
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name="Movie",
+            name="Actor",
             fields=[
                 (
                     "id",
@@ -20,20 +21,9 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("title", models.CharField(max_length=255)),
-                ("description", models.TextField()),
-                ("actors", models.ManyToManyField(
-                    related_name="movies",
-                    to="db.actor",
-                )),
-                ("genres", models.ManyToManyField(
-                    related_name="movies",
-                    to="db.genre",
-                )),
+                ("first_name", models.CharField(max_length=255)),
+                ("last_name", models.CharField(max_length=255)),
             ],
-            options={
-                "indexes": [models.Index(fields=["title"], name="db_movie_title_idx")],
-            },
         ),
         migrations.CreateModel(
             name="CinemaHall",
@@ -53,6 +43,43 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name="Genre",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+            ],
+        ),
+        migrations.CreateModel(
+            name="Movie",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                ("duration", models.IntegerField()),
+                ("actors", models.ManyToManyField(to="db.actor")),
+                ("genres", models.ManyToManyField(to="db.genre")),
+            ],
+            options={
+                "indexes": [models.Index(fields=["title"], name="db_movie_title_8f6fd1_idx")],
+            },
+        ),
+        migrations.CreateModel(
             name="MovieSession",
             fields=[
                 (
@@ -69,7 +96,6 @@ class Migration(migrations.Migration):
                     "cinema_hall",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="movie_sessions",
                         to="db.cinemahall",
                     ),
                 ),
@@ -77,7 +103,6 @@ class Migration(migrations.Migration):
                     "movie",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="movie_sessions",
                         to="db.movie",
                     ),
                 ),

@@ -9,21 +9,15 @@ def get_movies(
     genres_ids: Optional[Iterable[int]] = None,
     actors_ids: Optional[Iterable[int]] = None,
 ) -> QuerySet[Movie]:
-    movies = Movie.objects.all()
+    queryset = Movie.objects.all()
 
-    if genres_ids is not None and actors_ids is not None:
-        return movies.filter(
-            genres__id__in=list(genres_ids),
-            actors__id__in=list(actors_ids),
-        ).distinct()
+    if genres_ids:
+        queryset = queryset.filter(genres__id__in=genres_ids)
 
-    if genres_ids is not None:
-        return movies.filter(genres__id__in=list(genres_ids)).distinct()
+    if actors_ids:
+        queryset = queryset.filter(actors__id__in=actors_ids)
 
-    if actors_ids is not None:
-        return movies.filter(actors__id__in=list(actors_ids)).distinct()
-
-    return movies
+    return queryset.distinct()
 
 
 def get_movie_by_id(movie_id: int) -> Movie:
@@ -33,18 +27,15 @@ def get_movie_by_id(movie_id: int) -> Movie:
 def create_movie(
     movie_title: str,
     movie_description: str,
-    genres_ids: Optional[Iterable[int]] = None,
-    actors_ids: Optional[Iterable[int]] = None,
+    movie_duration: int,
+    genres_ids: Iterable[int],
+    actors_ids: Iterable[int],
 ) -> Movie:
     movie = Movie.objects.create(
         title=movie_title,
         description=movie_description,
+        duration=movie_duration,
     )
-
-    if genres_ids is not None:
-        movie.genres.set(list(genres_ids))
-
-    if actors_ids is not None:
-        movie.actors.set(list(actors_ids))
-
+    movie.genres.set(genres_ids)
+    movie.actors.set(actors_ids)
     return movie
